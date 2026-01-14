@@ -70,7 +70,7 @@ export const PORTFOLIO_ITEMS: Project[] = [
     longDescription: "Standing majestically on the banks of the Nile, this project represents the pinnacle of waterfront living. The design maximizes the panoramic views of Cairo while providing an oasis of tranquility. Residents enjoy private access to a river promenade, infinity pools, and a world-class wellness center.",
     longDescription_ar: "يقف هذا المشروع بشموخ على ضفاف النيل، ويمثل قمة المعيشة على الواجهة البحرية. يتيح التصميم إطلالات بانورامية على القاهرة مع توفير واحة من الهدوء. يتمتع السكان بمدخل خاص لممشى نهري وحمامات سباحة لا متناهية ومركز صحي عالمي المستوى.",
     imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuCHBqOmLe4In6MDAaQa7pq4pNFjN2ggWLDwjLFvJXBhF7_naqudxyyqcr1IIeUSx1RdIrSphGvbE34f0gbzsQCsQ7WJ3XeGydHaVDFA96o7Ut044kMAu8X6x4FyiNtg8B8vlzvPoEJoPuntKtzakPvIBpQ6hQjgWJpAfwlsB4T-mY2hIIxINE1cbA7SDHrzaIDXQJOl5v4PqQH9kzXZmEYYh_cgF5x48VFfsbbbfYQng5fu9hAbfSyw5tKhGQj-V-NOAqpiYQ52RY1n",
-    videoUrl: "https://www.youtube.com/embed/ScMzIvxBSi4?si=123" 
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" 
   },
   {
     id: 2,

@@ -3,11 +3,181 @@ import { PORTFOLIO_ITEMS } from '../constants';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Project } from '../types';
 
+// --- Custom Video Player Component ---
+const CustomVideoPlayer: React.FC<{ src: string, poster: string, title: string }> = ({ src, poster, title }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [currentTime, setCurrentTime] = useState('0:00');
+  const [duration, setDuration] = useState('0:00');
+  const [showControls, setShowControls] = useState(false);
+
+  // Check if it's a direct file or embed
+  const isEmbed = src.includes('youtube.com') || src.includes('vimeo.com') || src.includes('embed');
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateProgress = () => {
+      if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100);
+        setCurrentTime(formatTime(video.currentTime));
+      }
+    };
+
+    const updateDuration = () => {
+      setDuration(formatTime(video.duration));
+    };
+
+    const onEnd = () => setIsPlaying(false);
+
+    video.addEventListener('timeupdate', updateProgress);
+    video.addEventListener('loadedmetadata', updateDuration);
+    video.addEventListener('ended', onEnd);
+
+    return () => {
+      video.removeEventListener('timeupdate', updateProgress);
+      video.removeEventListener('loadedmetadata', updateDuration);
+      video.removeEventListener('ended', onEnd);
+    };
+  }, []);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    if (videoRef.current) {
+      const newTime = (val / 100) * videoRef.current.duration;
+      videoRef.current.currentTime = newTime;
+      setProgress(val);
+    }
+  };
+
+  const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setVolume(val);
+    if (videoRef.current) {
+      videoRef.current.volume = val;
+    }
+  };
+
+  if (isEmbed) {
+    return (
+      <iframe 
+        src={`${src}&autoplay=1`}
+        className="w-full h-full object-cover" 
+        title={title}
+        frameBorder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowFullScreen
+      ></iframe>
+    );
+  }
+
+  return (
+    <div 
+      className="relative w-full h-full bg-black group"
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        className="w-full h-full object-cover"
+        onClick={togglePlay}
+        playsInline
+      />
+      
+      {/* Custom Controls Overlay */}
+      <div className={`absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent transition-opacity duration-300 ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Progress Bar */}
+        <div className="mb-4 relative h-1 bg-white/30 rounded-full cursor-pointer group/seek">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={progress}
+            onChange={handleSeek}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          />
+          <div 
+            className="absolute top-0 left-0 h-full bg-accent rounded-full pointer-events-none"
+            style={{ width: `${progress}%` }}
+          >
+             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full scale-0 group-hover/seek:scale-100 transition-transform shadow"></div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={togglePlay}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-colors text-white"
+            >
+              <span className="material-symbols-outlined text-2xl">
+                {isPlaying ? 'pause' : 'play_arrow'}
+              </span>
+            </button>
+            <span className="text-white text-xs font-mono tracking-wider">
+              {currentTime} / {duration}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-white text-lg">volume_up</span>
+            <input 
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={handleVolume}
+              className="w-20 accent-white h-1 bg-white/30 rounded-full appearance-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Big Play Button (centered) - hidden when playing */}
+      {!isPlaying && (
+        <div 
+          onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/10 transition-colors"
+        >
+          <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-110 transition-transform duration-300">
+             <span className="material-symbols-outlined text-5xl text-white ml-1">play_arrow</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+// ------------------------------------
+
 const Portfolio: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
   
   const { t, language, dir } = useLanguage();
 
@@ -71,6 +241,27 @@ const Portfolio: React.FC = () => {
     setSelectedProject(item);
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShowCopied(true);
+    setTimeout(() => setShowCopied(false), 2000);
+  };
+
+  // Navigation Logic
+  const currentIndex = selectedProject 
+    ? filteredItems.findIndex(p => p.id === selectedProject.id) 
+    : 0;
+
+  const handleNext = () => {
+    const nextIndex = (currentIndex + 1) % filteredItems.length;
+    setSelectedProject(filteredItems[nextIndex]);
+  };
+
+  const handlePrev = () => {
+    const prevIndex = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
+    setSelectedProject(filteredItems[prevIndex]);
+  };
+
   return (
     <section className="py-24 bg-surface border-t border-white/5 overflow-hidden">
       <div className="px-6 mb-12 max-w-7xl mx-auto">
@@ -130,6 +321,7 @@ const Portfolio: React.FC = () => {
       <div 
         ref={scrollContainerRef}
         className="flex overflow-x-auto gap-8 px-6 pb-20 no-scrollbar snap-x snap-mandatory max-w-[1800px] mx-auto perspective-container"
+        key={activeFilter} // Trigger animation on filter change
       >
         {filteredItems.map((item, index) => {
           const title = language === 'ar' ? item.title_ar : item.title;
@@ -141,7 +333,7 @@ const Portfolio: React.FC = () => {
           return (
             <div
               key={item.id}
-              className="min-w-[85vw] md:min-w-[500px] snap-center group preserve-3d animate-reveal-card cursor-pointer"
+              className="min-w-[85vw] md:min-w-[500px] snap-center group preserve-3d animate-fade-in cursor-pointer"
               style={{ animationDelay: `${index * 100}ms` }}
               onClick={() => handleProjectClick(item)}
             >
@@ -155,8 +347,9 @@ const Portfolio: React.FC = () => {
                 {/* Video Play Overlay */}
                 {item.videoUrl && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-glow">
-                      <span className="material-symbols-outlined text-4xl text-white ml-1">play_arrow</span>
+                    <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)]">
+                      <span className="material-symbols-outlined text-5xl text-white ml-2">play_arrow</span>
+                      <div className="absolute inset-0 rounded-full border border-white/30 animate-ping opacity-20"></div>
                     </div>
                   </div>
                 )}
@@ -165,7 +358,6 @@ const Portfolio: React.FC = () => {
                    <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold tracking-widest px-4 py-1.5 rounded-full uppercase">
                     {category}
                   </span>
-                  {/* Display tags on card */}
                    <div className="flex gap-1">
                       {tags.slice(0, 2).map(tag => (
                         <span key={tag} className="bg-black/40 backdrop-blur-md text-white/70 text-[9px] px-3 py-1 rounded-full border border-white/5">
@@ -210,14 +402,11 @@ const Portfolio: React.FC = () => {
               {/* Media Section (Video or Image) */}
               <div className="relative md:w-7/12 h-[40vh] md:h-full bg-black group">
                 {selectedProject.videoUrl ? (
-                   <iframe 
-                    src={`${selectedProject.videoUrl}&autoplay=1`}
-                    className="w-full h-full object-cover" 
-                    title={selectedProject.title}
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen
-                  ></iframe>
+                   <CustomVideoPlayer 
+                      src={selectedProject.videoUrl} 
+                      poster={selectedProject.imageUrl} 
+                      title={selectedProject.title} 
+                   />
                 ) : (
                   <div 
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-[2s] group-hover:scale-105"
@@ -238,6 +427,39 @@ const Portfolio: React.FC = () => {
                 >
                   <span className="material-symbols-outlined text-white/80">close</span>
                 </button>
+
+                {/* Share Button */}
+                <button 
+                  onClick={handleShare}
+                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${dir === 'rtl' ? 'left-20' : 'right-20'}`}
+                >
+                  <span className="material-symbols-outlined text-white/80 text-sm">ios_share</span>
+                  {showCopied && (
+                    <div className="absolute top-full mt-2 bg-white text-black text-[10px] font-bold py-1 px-2 rounded-md shadow-lg whitespace-nowrap">
+                      Copied!
+                    </div>
+                  )}
+                </button>
+
+                {/* Navigation Buttons (Floating over Content) */}
+                <div className={`absolute top-1/2 -translate-y-1/2 z-30 w-full px-4 flex justify-between pointer-events-none ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                    {filteredItems.length > 1 && (
+                      <>
+                        <button 
+                          onClick={handlePrev} 
+                          className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-white hover:text-black transition-all flex items-center justify-center pointer-events-auto -ml-16 md:ml-0"
+                        >
+                           <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>chevron_left</span>
+                        </button>
+                        <button 
+                          onClick={handleNext} 
+                          className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-white hover:text-black transition-all flex items-center justify-center pointer-events-auto -mr-16 md:mr-0"
+                        >
+                           <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>chevron_right</span>
+                        </button>
+                      </>
+                    )}
+                </div>
 
                 {/* Header Area */}
                 <div className="p-10 md:p-14 pb-6 border-b border-white/5">
