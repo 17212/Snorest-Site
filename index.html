@@ -31,14 +31,16 @@
                         'glow': '0 0 30px rgba(197, 160, 89, 0.15)',
                         'inner-glow': 'inset 0 0 40px rgba(255, 255, 255, 0.03)',
                         'card-hover': '0 20px 40px -10px rgba(0,0,0,0.6)',
-                        'apple-card': '0 8px 30px rgba(0,0,0,0.12)',
+                        'apple-card': '0 8px 30px rgba(0,0,0,0.2)',
                     },
                     animation: {
                         'slow-pan': 'pan 30s ease-in-out infinite alternate',
                         'glow-pulse': 'glow-pulse 3s infinite alternate',
                         'reveal-card': 'reveal-card 0.8s cubic-bezier(0.32, 0.72, 0, 1) forwards',
-                        'modal-enter': 'modal-enter 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards',
+                        'modal-enter': 'modal-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'modal-exit': 'modal-exit 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards',
                         'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'fade-out': 'fadeOut 0.4s ease-out forwards',
                     },
                     keyframes: {
                         pan: {
@@ -54,12 +56,20 @@
                             '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
                         },
                         'modal-enter': {
-                            '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+                            '0%': { opacity: '0', transform: 'scale(0.95) translateY(20px)' },
                             '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        },
+                        'modal-exit': {
+                            '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                            '100%': { opacity: '0', transform: 'scale(0.95) translateY(20px)' },
                         },
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0' },
                         }
                     }
                 },

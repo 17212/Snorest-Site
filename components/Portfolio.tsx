@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { PORTFOLIO_ITEMS } from '../constants';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Project } from '../types';
@@ -7,6 +7,9 @@ const Portfolio: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  
   const { t, language, dir } = useLanguage();
 
   // Combine Categories and Tags into one filter list
@@ -36,6 +39,16 @@ const Portfolio: React.FC = () => {
     });
   }, [activeFilter, language]);
 
+  // Smooth scroll to start when filter changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
+  }, [activeFilter]);
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 450;
@@ -45,6 +58,19 @@ const Portfolio: React.FC = () => {
         behavior: 'smooth',
       });
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedProject(null);
+      setIsClosing(false);
+      setIsDescriptionExpanded(false);
+    }, 400); // Match animation duration
+  };
+
+  const handleProjectClick = (item: Project) => {
+    setSelectedProject(item);
   };
 
   return (
@@ -79,10 +105,10 @@ const Portfolio: React.FC = () => {
         <div className="flex flex-wrap gap-3 mb-8">
           <button
               onClick={() => setActiveFilter('All')}
-              className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 ${
+              className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 border border-transparent ${
                 activeFilter === 'All'
                   ? 'bg-white text-black shadow-lg scale-105'
-                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card'
+                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card hover:border-white/10'
               }`}
             >
               {t('all')} <span className="opacity-60 ml-1">({PORTFOLIO_ITEMS.length})</span>
@@ -91,10 +117,10 @@ const Portfolio: React.FC = () => {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 ${
+              className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 border border-transparent ${
                 activeFilter === filter
                   ? 'bg-white text-black shadow-lg scale-105'
-                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card'
+                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card hover:border-white/10'
               }`}
             >
               {filter} <span className="opacity-60 ml-1">({getCount(filter)})</span>
@@ -119,7 +145,7 @@ const Portfolio: React.FC = () => {
               key={item.id}
               className="min-w-[85vw] md:min-w-[500px] snap-center group preserve-3d animate-reveal-card cursor-pointer"
               style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => setSelectedProject(item)}
+              onClick={() => handleProjectClick(item)}
             >
               <div className="relative h-[650px] rounded-[2.5rem] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] transform group-hover:scale-[1.02] shadow-apple-card bg-surface-card border border-white/5">
                 <div
@@ -127,6 +153,15 @@ const Portfolio: React.FC = () => {
                   style={{ backgroundImage: `url('${item.imageUrl}')` }}
                 ></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+
+                {/* Video Play Overlay */}
+                {item.videoUrl && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-glow">
+                      <span className="material-symbols-outlined text-4xl text-white ml-1">play_arrow</span>
+                    </div>
+                  </div>
+                )}
 
                 <div className={`absolute top-8 ${dir === 'rtl' ? 'left-8' : 'right-8'} flex flex-col items-end gap-2`}>
                    <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold tracking-widest px-4 py-1.5 rounded-full uppercase">
@@ -169,16 +204,16 @@ const Portfolio: React.FC = () => {
        {selectedProject && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-xl animate-fade-in"
-              onClick={() => setSelectedProject(null)}
+              className={`absolute inset-0 bg-black/60 backdrop-blur-3xl transition-opacity duration-400 ease-out ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+              onClick={handleCloseModal}
             ></div>
-            <div className="relative w-full max-w-6xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row animate-modal-enter md:h-[80vh] border border-white/10">
+            <div className={`relative w-full max-w-6xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[80vh] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
               
               {/* Media Section (Video or Image) */}
               <div className="relative md:w-2/3 h-[40vh] md:h-full bg-black group">
                 {selectedProject.videoUrl ? (
                    <iframe 
-                    src={selectedProject.videoUrl} 
+                    src={`${selectedProject.videoUrl}&autoplay=1`}
                     className="w-full h-full object-cover" 
                     title={selectedProject.title}
                     frameBorder="0" 
@@ -200,7 +235,7 @@ const Portfolio: React.FC = () => {
               {/* Content Section */}
               <div className="p-10 md:p-16 md:w-1/3 flex flex-col relative bg-[#1c1c1e] overflow-y-auto no-scrollbar">
                  <button 
-                  onClick={() => setSelectedProject(null)}
+                  onClick={handleCloseModal}
                   className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-10 ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
                 >
                   <span className="material-symbols-outlined text-white/80">close</span>
@@ -230,11 +265,28 @@ const Portfolio: React.FC = () => {
                   <p>
                     {language === 'ar' ? selectedProject.description_ar : selectedProject.description}
                   </p>
-                  <p className="text-base text-apple-gray">
-                    {language === 'ar' 
-                      ? (selectedProject.longDescription_ar || "") 
-                      : (selectedProject.longDescription || "")}
-                  </p>
+                  <div>
+                    <p className="text-base text-apple-gray">
+                      {(() => {
+                        const fullText = language === 'ar' 
+                          ? (selectedProject.longDescription_ar || "") 
+                          : (selectedProject.longDescription || "");
+                        
+                        if (fullText.length <= 150 || isDescriptionExpanded) {
+                          return fullText;
+                        }
+                        return fullText.slice(0, 150) + '...';
+                      })()}
+                    </p>
+                    {((language === 'ar' ? (selectedProject.longDescription_ar || "") : (selectedProject.longDescription || "")).length > 150) && (
+                      <button 
+                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        className="text-accent text-xs font-bold uppercase tracking-widest mt-2 hover:text-white transition-colors"
+                      >
+                        {isDescriptionExpanded ? 'Read Less' : 'Read More'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-12 pt-6 border-t border-white/5">

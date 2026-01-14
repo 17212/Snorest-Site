@@ -5,7 +5,22 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const Expertise: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const { t, language, dir } = useLanguage();
+
+  const handleCloseModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedService(null);
+      setIsClosing(false);
+      setIsDescriptionExpanded(false);
+    }, 400);
+  };
+
+  const handleCardClick = (item: Service) => {
+    setSelectedService(item);
+  };
 
   return (
     <section className="py-32 px-4 bg-surface relative z-10 border-t border-white/5">
@@ -26,7 +41,6 @@ const Expertise: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:auto-rows-[340px]">
           {EXPERTISE_ITEMS.map((item) => {
-            const handleCardClick = () => setSelectedService(item);
             const title = language === 'ar' ? item.title_ar : item.title;
             const description = language === 'ar' ? item.description_ar : item.description;
 
@@ -34,7 +48,7 @@ const Expertise: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  onClick={handleCardClick}
+                  onClick={() => handleCardClick(item)}
                   className="md:col-span-2 md:row-span-2 group relative rounded-[2.5rem] overflow-hidden border border-white/5 bg-surface-card shadow-apple-card cursor-pointer transition-all duration-500 hover:shadow-2xl hover:scale-[0.99] active:scale-[0.97]"
                 >
                   <div
@@ -70,7 +84,7 @@ const Expertise: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  onClick={handleCardClick}
+                  onClick={() => handleCardClick(item)}
                   className="md:col-span-1 md:row-span-2 group relative rounded-[2.5rem] overflow-hidden border border-white/5 bg-surface-card shadow-apple-card cursor-pointer transition-all duration-500 hover:-translate-y-2"
                 >
                   <div
@@ -97,7 +111,7 @@ const Expertise: React.FC = () => {
             return (
               <div
                 key={item.id}
-                onClick={handleCardClick}
+                onClick={() => handleCardClick(item)}
                 className="md:col-span-1 group relative rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#151515] p-8 flex flex-col justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer"
               >
                 <div className="flex justify-between items-start">
@@ -125,10 +139,10 @@ const Expertise: React.FC = () => {
         {selectedService && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-xl animate-fade-in"
-              onClick={() => setSelectedService(null)}
+              className={`absolute inset-0 bg-black/60 backdrop-blur-3xl transition-opacity duration-400 ease-out ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+              onClick={handleCloseModal}
             ></div>
-            <div className="relative w-full max-w-5xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row animate-modal-enter md:h-[650px] border border-white/10">
+            <div className={`relative w-full max-w-5xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[650px] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
               <div className="relative md:w-1/2 h-72 md:h-full bg-black group">
                 {selectedService.imageUrl ? (
                   <div 
@@ -145,7 +159,7 @@ const Expertise: React.FC = () => {
               
               <div className="p-10 md:p-16 md:w-1/2 flex flex-col justify-center relative bg-[#1c1c1e]">
                  <button 
-                  onClick={() => setSelectedService(null)}
+                  onClick={handleCloseModal}
                   className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
                 >
                   <span className="material-symbols-outlined text-white/80">close</span>
@@ -166,11 +180,28 @@ const Expertise: React.FC = () => {
                   <p>
                     {language === 'ar' ? selectedService.description_ar : selectedService.description}
                   </p>
-                  <p className="text-base text-apple-gray">
-                    {language === 'ar' 
-                      ? (selectedService.longDescription_ar || selectedService.description_ar) 
-                      : (selectedService.longDescription || selectedService.description)}
-                  </p>
+                  <div>
+                    <p className="text-base text-apple-gray">
+                      {(() => {
+                        const fullText = language === 'ar' 
+                          ? (selectedService.longDescription_ar || selectedService.description_ar) 
+                          : (selectedService.longDescription || selectedService.description);
+                        
+                        if (fullText.length <= 150 || isDescriptionExpanded) {
+                          return fullText;
+                        }
+                        return fullText.slice(0, 150) + '...';
+                      })()}
+                    </p>
+                    {((language === 'ar' ? (selectedService.longDescription_ar || selectedService.description_ar) : (selectedService.longDescription || selectedService.description)).length > 150) && (
+                      <button 
+                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        className="text-accent text-xs font-bold uppercase tracking-widest mt-2 hover:text-white transition-colors"
+                      >
+                        {isDescriptionExpanded ? 'Read Less' : 'Read More'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-12 pt-6 border-t border-white/5">
