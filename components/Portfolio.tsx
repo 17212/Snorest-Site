@@ -8,7 +8,6 @@ const Portfolio: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isClosing, setIsClosing] = useState(false);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   
   const { t, language, dir } = useLanguage();
 
@@ -65,7 +64,6 @@ const Portfolio: React.FC = () => {
     setTimeout(() => {
       setSelectedProject(null);
       setIsClosing(false);
-      setIsDescriptionExpanded(false);
     }, 400); // Match animation duration
   };
 
@@ -207,10 +205,10 @@ const Portfolio: React.FC = () => {
               className={`absolute inset-0 bg-black/60 backdrop-blur-3xl transition-opacity duration-400 ease-out ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
               onClick={handleCloseModal}
             ></div>
-            <div className={`relative w-full max-w-6xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[80vh] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
+            <div className={`relative w-full max-w-7xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[85vh] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
               
               {/* Media Section (Video or Image) */}
-              <div className="relative md:w-2/3 h-[40vh] md:h-full bg-black group">
+              <div className="relative md:w-7/12 h-[40vh] md:h-full bg-black group">
                 {selectedProject.videoUrl ? (
                    <iframe 
                     src={`${selectedProject.videoUrl}&autoplay=1`}
@@ -228,70 +226,87 @@ const Portfolio: React.FC = () => {
                 )}
                 
                 {!selectedProject.videoUrl && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#1c1c1e]/10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#1c1c1e]/20"></div>
                 )}
               </div>
               
               {/* Content Section */}
-              <div className="p-10 md:p-16 md:w-1/3 flex flex-col relative bg-[#1c1c1e] overflow-y-auto no-scrollbar">
+              <div className="flex-1 flex flex-col relative bg-[#1c1c1e]">
                  <button 
                   onClick={handleCloseModal}
-                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-10 ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
+                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
                 >
                   <span className="material-symbols-outlined text-white/80">close</span>
                 </button>
 
-                <div className="mt-8 mb-8">
-                  <div className="flex flex-wrap gap-2 mb-4">
+                {/* Header Area */}
+                <div className="p-10 md:p-14 pb-6 border-b border-white/5">
+                  <div className="flex items-center gap-3 mb-4">
                      <span className="text-accent text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-accent/10">
                         {language === 'ar' ? selectedProject.category_ar : selectedProject.category}
                      </span>
-                     {(language === 'ar' ? (selectedProject.tags_ar || []) : (selectedProject.tags || [])).map(tag => (
-                        <span key={tag} className="text-apple-gray text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-white/5 border border-white/5">
+                     <span className="text-apple-gray text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                        <span className="w-1 h-1 rounded-full bg-apple-gray"></span>
+                        {language === 'ar' ? selectedProject.location_ar : selectedProject.location}
+                     </span>
+                  </div>
+                  <h2 className="text-3xl md:text-5xl font-semibold text-white mb-0 leading-[1.1]">
+                    {language === 'ar' ? selectedProject.title_ar : selectedProject.title}
+                  </h2>
+                </div>
+                
+                {/* Scrollable Content */}
+                <div className={`overflow-y-auto no-scrollbar flex-grow p-10 md:p-14 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
+                  
+                   {/* Specs Grid */}
+                   <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                         <span className="block text-white/40 text-[10px] font-bold uppercase tracking-wider mb-1">Status</span>
+                         <span className="text-white text-sm font-medium">Completed</span>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                         <span className="block text-white/40 text-[10px] font-bold uppercase tracking-wider mb-1">Year</span>
+                         <span className="text-white text-sm font-medium">2024</span>
+                      </div>
+                       <div className="p-4 rounded-xl bg-white/5 border border-white/5 col-span-2 md:col-span-1">
+                         <span className="block text-white/40 text-[10px] font-bold uppercase tracking-wider mb-1">Type</span>
+                         <span className="text-white text-sm font-medium">{language === 'ar' ? selectedProject.category_ar : selectedProject.category}</span>
+                      </div>
+                   </div>
+
+                   {/* Main Description */}
+                   <div className="mb-10">
+                      <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4 opacity-80 border-b border-white/10 pb-2 inline-block">Overview</h4>
+                      <p className="text-xl text-white/90 font-light leading-relaxed">
+                         {language === 'ar' ? selectedProject.description_ar : selectedProject.description}
+                      </p>
+                   </div>
+
+                   {/* Deep Dive */}
+                   <div className="mb-8">
+                       <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4 opacity-80 border-b border-white/10 pb-2 inline-block">In-Depth</h4>
+                       <p className="text-base text-apple-gray leading-loose">
+                         {language === 'ar' 
+                            ? (selectedProject.longDescription_ar || "") 
+                            : (selectedProject.longDescription || "")}
+                       </p>
+                   </div>
+
+                   {/* Tags */}
+                   <div className="flex flex-wrap gap-2">
+                      {(language === 'ar' ? (selectedProject.tags_ar || []) : (selectedProject.tags || [])).map(tag => (
+                        <span key={tag} className="text-white/60 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
                           {tag}
                         </span>
                      ))}
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-semibold text-white mb-2 leading-tight">
-                    {language === 'ar' ? selectedProject.title_ar : selectedProject.title}
-                  </h2>
-                   <div className="flex items-center gap-2 text-apple-gray text-sm font-medium">
-                    <span className="material-symbols-outlined text-base">location_on</span>
-                    {language === 'ar' ? selectedProject.location_ar : selectedProject.location}
-                  </div>
-                </div>
-                
-                <div className={`space-y-6 text-[#d1d1d6] text-lg leading-relaxed font-light flex-grow ${dir === 'rtl' ? 'border-r border-white/10 pr-6' : 'border-l border-white/10 pl-6'}`}>
-                  <p>
-                    {language === 'ar' ? selectedProject.description_ar : selectedProject.description}
-                  </p>
-                  <div>
-                    <p className="text-base text-apple-gray">
-                      {(() => {
-                        const fullText = language === 'ar' 
-                          ? (selectedProject.longDescription_ar || "") 
-                          : (selectedProject.longDescription || "");
-                        
-                        if (fullText.length <= 150 || isDescriptionExpanded) {
-                          return fullText;
-                        }
-                        return fullText.slice(0, 150) + '...';
-                      })()}
-                    </p>
-                    {((language === 'ar' ? (selectedProject.longDescription_ar || "") : (selectedProject.longDescription || "")).length > 150) && (
-                      <button 
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        className="text-accent text-xs font-bold uppercase tracking-widest mt-2 hover:text-white transition-colors"
-                      >
-                        {isDescriptionExpanded ? 'Read Less' : 'Read More'}
-                      </button>
-                    )}
-                  </div>
+                   </div>
                 </div>
 
-                <div className="mt-12 pt-6 border-t border-white/5">
-                   <button className="bg-white text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all w-full shadow-lg">
+                {/* Footer Action */}
+                <div className="p-8 md:p-14 pt-6 border-t border-white/5 bg-[#1c1c1e] z-10">
+                   <button className="bg-white text-black h-14 w-full rounded-full font-bold text-xs uppercase tracking-widest hover:scale-[1.01] transition-all shadow-lg flex items-center justify-center gap-2 group">
                       {t('start_project')}
+                      <span className={`material-symbols-outlined text-lg transition-transform ${dir === 'rtl' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>arrow_forward</span>
                    </button>
                 </div>
               </div>

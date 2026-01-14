@@ -36,16 +36,16 @@ const Hero: React.FC = () => {
         </div>
         
         <h1 className="text-5xl md:text-8xl font-bold leading-[0.9] tracking-tight mb-6 text-white">
-          <span className="block animate-[fadeIn_1s_ease-out] text-glow">
+          <span className="block animate-slide-in-left text-glow">
             {t('future')}
           </span>
-          <span className="block text-white opacity-0 animate-[fadeIn_1s_ease-out_0.8s_forwards] text-white/80">
+          <span className="block text-white opacity-0 animate-slide-in-right [animation-delay:0.3s] text-white/80">
             {t('defined')}
           </span>
         </h1>
 
         <div className={`flex flex-col md:flex-row md:items-end justify-between gap-8 border-l border-white/20 pl-6 md:pl-8 ${isRtl ? 'md:border-l-0 md:border-r md:pl-0 md:pr-8' : ''}`}>
-          <div className="max-w-md">
+          <div className="max-w-md animate-fade-in [animation-delay:0.6s] opacity-0">
             <h2
               className="text-3xl md:text-5xl font-arabic font-extralight text-white leading-tight mb-4"
               dir="rtl"
@@ -56,7 +56,7 @@ const Hero: React.FC = () => {
               {t('slogan_desc')}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 animate-fade-in [animation-delay:0.8s] opacity-0">
             <button className="bg-white text-surface font-bold py-4 px-8 rounded-full hover:bg-gray-200 transition-all active:scale-95 flex items-center gap-2 group shadow-[0_0_20px_rgba(255,255,255,0.3)]">
               {t('start_project')}
               <span className={`material-symbols-outlined text-sm transition-transform ${isRtl ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`}>

@@ -6,7 +6,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 const Expertise: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isClosing, setIsClosing] = useState(false);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [activeSection, setActiveSection] = useState<'overview' | 'details'>('overview');
+  
   const { t, language, dir } = useLanguage();
 
   const handleCloseModal = () => {
@@ -14,7 +15,7 @@ const Expertise: React.FC = () => {
     setTimeout(() => {
       setSelectedService(null);
       setIsClosing(false);
-      setIsDescriptionExpanded(false);
+      setActiveSection('overview');
     }, 400);
   };
 
@@ -93,7 +94,7 @@ const Expertise: React.FC = () => {
                   ></div>
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-surface-card/10 to-surface-card"></div>
                   <div className={`absolute bottom-0 p-8 w-full ${dir === 'rtl' ? 'right-0' : 'left-0'}`}>
-                    <div className="w-12 h-12 rounded-2xl bg-surface-highlight flex items-center justify-center mb-6 text-white group-hover:bg-accent group-hover:text-black transition-colors">
+                    <div className="w-12 h-12 rounded-2xl bg-surface-highlight flex items-center justify-center mb-6 text-white group-hover:bg-accent group-hover:text-black transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                       <span className="material-symbols-outlined text-2xl">
                         {item.icon}
                       </span>
@@ -115,7 +116,7 @@ const Expertise: React.FC = () => {
                 className="md:col-span-1 group relative rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#151515] p-8 flex flex-col justify-between hover:bg-[#1a1a1a] transition-colors cursor-pointer"
               >
                 <div className="flex justify-between items-start">
-                  <span className="material-symbols-outlined text-white/30 text-4xl group-hover:text-white transition-colors">
+                  <span className="material-symbols-outlined text-white/30 text-4xl transition-all duration-500 group-hover:text-accent group-hover:rotate-12 group-hover:scale-110">
                     {item.icon}
                   </span>
                   <span className="text-white/20 text-xs font-mono">
@@ -142,71 +143,104 @@ const Expertise: React.FC = () => {
               className={`absolute inset-0 bg-black/60 backdrop-blur-3xl transition-opacity duration-400 ease-out ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
               onClick={handleCloseModal}
             ></div>
-            <div className={`relative w-full max-w-5xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[650px] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
-              <div className="relative md:w-1/2 h-72 md:h-full bg-black group">
+            <div className={`relative w-full max-w-5xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[700px] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
+              <div className="relative md:w-5/12 h-64 md:h-full bg-black group overflow-hidden">
                 {selectedService.imageUrl ? (
                   <div 
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-[2s] group-hover:scale-105"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-[3s] group-hover:scale-110"
                     style={{ backgroundImage: `url('${selectedService.imageUrl}')` }}
                   ></div>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-surface-highlight">
-                     <span className="material-symbols-outlined text-8xl text-white/10">{selectedService.icon}</span>
+                     <span className="material-symbols-outlined text-9xl text-white/5 group-hover:scale-110 transition-transform duration-700">{selectedService.icon}</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#1c1c1e]/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1e] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#1c1c1e]/40"></div>
+                
+                {/* Visual Accent in Image */}
+                <div className="absolute bottom-8 left-8 right-8">
+                   <div className="text-6xl font-bold text-white/10 font-arabic select-none">
+                      {selectedService.subtitle || "0" + selectedService.id}
+                   </div>
+                </div>
               </div>
               
-              <div className="p-10 md:p-16 md:w-1/2 flex flex-col justify-center relative bg-[#1c1c1e]">
+              <div className="flex-1 flex flex-col relative bg-[#1c1c1e]">
                  <button 
                   onClick={handleCloseModal}
-                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
+                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
                 >
                   <span className="material-symbols-outlined text-white/80">close</span>
                 </button>
 
-                <div className="mb-8">
+                <div className="p-10 md:p-14 pb-0">
                   {selectedService.subtitle && (
-                    <span className="text-accent text-xs font-bold uppercase tracking-widest mb-3 block">
+                    <span className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block">
                       {selectedService.subtitle}
                     </span>
                   )}
-                  <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 leading-tight">
+                  <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 leading-[1.1]">
                     {language === 'ar' ? selectedService.title_ar : selectedService.title}
                   </h2>
-                </div>
-                
-                <div className={`space-y-6 text-[#d1d1d6] leading-relaxed font-light text-lg ${dir === 'rtl' ? 'border-r border-white/10 pr-6' : 'border-l border-white/10 pl-6'}`}>
-                  <p>
-                    {language === 'ar' ? selectedService.description_ar : selectedService.description}
-                  </p>
-                  <div>
-                    <p className="text-base text-apple-gray">
-                      {(() => {
-                        const fullText = language === 'ar' 
-                          ? (selectedService.longDescription_ar || selectedService.description_ar) 
-                          : (selectedService.longDescription || selectedService.description);
-                        
-                        if (fullText.length <= 150 || isDescriptionExpanded) {
-                          return fullText;
-                        }
-                        return fullText.slice(0, 150) + '...';
-                      })()}
-                    </p>
-                    {((language === 'ar' ? (selectedService.longDescription_ar || selectedService.description_ar) : (selectedService.longDescription || selectedService.description)).length > 150) && (
-                      <button 
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        className="text-accent text-xs font-bold uppercase tracking-widest mt-2 hover:text-white transition-colors"
-                      >
-                        {isDescriptionExpanded ? 'Read Less' : 'Read More'}
-                      </button>
-                    )}
+                  
+                  {/* Tabs / Sections */}
+                  <div className="flex gap-6 border-b border-white/10 mb-8">
+                     <button 
+                        onClick={() => setActiveSection('overview')}
+                        className={`pb-4 text-xs font-bold uppercase tracking-widest transition-colors relative ${activeSection === 'overview' ? 'text-white' : 'text-white/40 hover:text-white'}`}
+                     >
+                        Overview
+                        {activeSection === 'overview' && <span className="absolute bottom-0 left-0 w-full h-[2px] bg-accent"></span>}
+                     </button>
+                     <button 
+                        onClick={() => setActiveSection('details')}
+                        className={`pb-4 text-xs font-bold uppercase tracking-widest transition-colors relative ${activeSection === 'details' ? 'text-white' : 'text-white/40 hover:text-white'}`}
+                     >
+                        Methodology
+                        {activeSection === 'details' && <span className="absolute bottom-0 left-0 w-full h-[2px] bg-accent"></span>}
+                     </button>
                   </div>
                 </div>
+                
+                <div className={`px-10 md:px-14 pb-10 overflow-y-auto no-scrollbar flex-grow ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
+                   {activeSection === 'overview' ? (
+                      <div className="animate-fade-in">
+                         <p className="text-xl text-white/90 font-light leading-relaxed mb-8">
+                           {language === 'ar' ? selectedService.description_ar : selectedService.description}
+                         </p>
+                         
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                               <div className="text-accent text-2xl mb-2">
+                                  <span className="material-symbols-outlined">award_star</span>
+                               </div>
+                               <h4 className="text-white text-sm font-bold mb-1">Premium Quality</h4>
+                               <p className="text-white/40 text-xs">Best in class execution</p>
+                            </div>
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                               <div className="text-accent text-2xl mb-2">
+                                  <span className="material-symbols-outlined">verified</span>
+                               </div>
+                               <h4 className="text-white text-sm font-bold mb-1">Certified</h4>
+                               <p className="text-white/40 text-xs">ISO & LEED Standards</p>
+                            </div>
+                         </div>
+                      </div>
+                   ) : (
+                      <div className="animate-fade-in">
+                          <p className="text-base text-apple-gray leading-loose">
+                           {language === 'ar' 
+                             ? (selectedService.longDescription_ar || selectedService.description_ar) 
+                             : (selectedService.longDescription || selectedService.description)}
+                          </p>
+                      </div>
+                   )}
+                </div>
 
-                <div className="mt-12 pt-6 border-t border-white/5">
-                   <button className="bg-white text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-lg">
+                <div className="p-8 md:p-14 pt-6 border-t border-white/5 mt-auto">
+                   <button className="bg-white text-black h-14 w-full rounded-full font-bold text-xs uppercase tracking-widest hover:scale-[1.02] transition-all shadow-lg flex items-center justify-center gap-2 group">
                       {t('inquire_now')}
+                      <span className={`material-symbols-outlined text-lg transition-transform ${dir === 'rtl' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>arrow_forward</span>
                    </button>
                 </div>
               </div>
