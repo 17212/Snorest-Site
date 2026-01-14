@@ -9,87 +9,84 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer id="footer" className="bg-surface pt-32 pb-12 px-6 border-t border-white/5 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <footer id="footer" className="bg-surface pt-40 pb-12 px-6 border-t border-white/5 relative overflow-hidden">
+      {/* Background Ambient Elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-accent/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-0 w-full text-center pointer-events-none opacity-[0.03] select-none overflow-hidden">
+         <h1 className="text-[20vw] font-bold text-white leading-none tracking-tighter">SNOREST</h1>
+      </div>
 
-      <div className="max-w-xl mx-auto text-center relative z-10">
-        <div className="w-20 h-20 mx-auto mb-8 rounded-full border border-white/10 flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent">
-          <span className="material-symbols-outlined text-accent text-4xl">
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <div className="w-24 h-24 mx-auto mb-10 rounded-3xl border border-white/10 flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent shadow-2xl transform rotate-3 hover:rotate-6 transition-transform duration-500">
+          <span className="material-symbols-outlined text-accent text-5xl">
             handshake
           </span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-white">
+        
+        <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight text-white leading-[0.9]">
           {t('lets_build')} <br />
-          {t('the_extraordinary')}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50">{t('the_extraordinary')}</span>
         </h2>
-        <p className="text-gray-400 mb-12 leading-relaxed font-light text-lg">
+        
+        <p className="text-apple-gray mb-16 leading-relaxed font-light text-xl max-w-xl mx-auto">
           {t('footer_desc')}
         </p>
 
         <button 
           onClick={scrollToTop}
-          className="bg-accent text-black font-bold py-5 px-12 rounded-2xl w-full md:w-auto hover:bg-white hover:scale-105 transition-all shadow-[0_0_40px_rgba(197,160,89,0.3)] mb-20 text-sm uppercase tracking-widest"
+          className="bg-accent text-black font-bold py-6 px-16 rounded-full w-full md:w-auto hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_50px_rgba(197,160,89,0.25)] mb-24 text-sm uppercase tracking-[0.2em]"
         >
           {t('start_consultation')}
         </button>
 
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/5 pt-12 ${dir === 'rtl' ? 'text-right' : 'text-left'} md:text-center`}>
+        <div className={`grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-white/5 pt-16 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
+          <div className="md:col-span-1">
+             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-accent mb-6">S</div>
+             <p className="text-xs text-white/40 leading-relaxed">
+               Redefining skylines with <br/> precision and luxury.
+             </p>
+          </div>
+          
           <div>
-            <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">
+            <h4 className="text-white font-bold mb-6 text-xs uppercase tracking-[0.2em] text-accent">
               {t('social')}
             </h4>
-            <ul className="space-y-2 text-gray-500 text-sm">
+            <ul className="space-y-4 text-gray-400 text-sm font-medium">
               <li>
-                <a className="hover:text-accent transition-colors" href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                  Facebook
+                <a className="hover:text-white transition-colors flex items-center gap-2" href="#" target="_blank">
+                  Instagram <span className="material-symbols-outlined text-[10px] opacity-50">north_east</span>
                 </a>
               </li>
               <li>
-                <a className="hover:text-accent transition-colors" href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                  Instagram
+                <a className="hover:text-white transition-colors flex items-center gap-2" href="#" target="_blank">
+                  LinkedIn <span className="material-symbols-outlined text-[10px] opacity-50">north_east</span>
                 </a>
               </li>
               <li>
-                <a className="hover:text-accent transition-colors" href="https://wa.me/" target="_blank" rel="noopener noreferrer">
-                  WhatsApp
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-accent transition-colors" href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                  LinkedIn
+                <a className="hover:text-white transition-colors flex items-center gap-2" href="#" target="_blank">
+                  WhatsApp <span className="material-symbols-outlined text-[10px] opacity-50">north_east</span>
                 </a>
               </li>
             </ul>
           </div>
+          
           <div>
-            <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">
+            <h4 className="text-white font-bold mb-6 text-xs uppercase tracking-[0.2em] text-accent">
               {t('company')}
             </h4>
-            <ul className="space-y-2 text-gray-500 text-sm">
-              <li>
-                <a className="hover:text-accent transition-colors" href="#">
-                  {t('about_us')}
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-accent transition-colors" href="#">
-                  {t('careers')}
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-accent transition-colors" href="#">
-                  {t('contact')}
-                </a>
-              </li>
+            <ul className="space-y-4 text-gray-400 text-sm font-medium">
+              <li><a className="hover:text-white transition-colors" href="#">{t('about_us')}</a></li>
+              <li><a className="hover:text-white transition-colors" href="#">{t('careers')}</a></li>
+              <li><a className="hover:text-white transition-colors" href="#">{t('contact')}</a></li>
             </ul>
           </div>
-          <div className="col-span-2 md:col-span-2 text-right md:text-center">
-            <p className="text-xs text-gray-600 mb-2">
-              © 2024 Snorest Construction. <br />
-              {t('rights_reserved')}
-            </p>
-            <p className="text-xs text-gray-700 font-mono">
+          
+          <div className="col-span-2 md:col-span-1 text-right md:text-right flex flex-col justify-between h-full">
+            <p className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">
               CAIRO — NEW CAPITAL — SAHEL
+            </p>
+            <p className="text-[10px] text-gray-700 mt-4">
+              © 2024 Snorest.
             </p>
           </div>
         </div>
