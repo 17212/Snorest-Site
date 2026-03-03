@@ -5,21 +5,25 @@ import Expertise from './components/Expertise';
 import Portfolio from './components/Portfolio';
 import Footer from './components/Footer';
 import FAB from './components/FAB';
+import IdrisiumSignature from './components/IdrisiumSignature';
 import { LanguageProvider } from './contexts/LanguageContext';
 
-const App: React.FC = () => {
+function App() {
   return (
     <LanguageProvider>
-      <main className="min-h-screen">
+      <div className="bg-background min-h-screen text-white font-sans selection:bg-accent selection:text-black">
         <Navbar />
-        <Hero />
-        <Expertise />
-        <Portfolio />
+        <main>
+          <Hero />
+          <Expertise />
+          <Portfolio />
+        </main>
         <Footer />
         <FAB />
-      </main>
+        <IdrisiumSignature />
+      </div>
     </LanguageProvider>
   );
-};
+}
 
 export default App;

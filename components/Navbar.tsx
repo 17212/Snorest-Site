@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Navbar: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
+  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() || 0;
+    if (latest > previous && latest > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+    setScrolled(latest > 50);
+  });
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
@@ -22,14 +27,22 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'pt-4' : 'pt-6'}`}>
+    <motion.nav 
+      variants={{
+        visible: { y: 0 },
+        hidden: { y: "-100%" },
+      }}
+      animate={hidden ? "hidden" : "visible"}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'pt-4' : 'pt-6'}`}
+    >
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 to-transparent pointer-events-none"></div>
       
-      <div className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'max-w-[1400px] w-[95%]' : 'max-w-4xl w-[90%]'}`}>
-        <div className={`glass-morphism rounded-full flex items-center justify-between transition-all duration-500 ring-1 ring-white/10 ${scrolled ? 'px-6 py-3 bg-black/60' : 'px-8 py-4 bg-black/30'}`}>
+      <div className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'max-w-7xl w-[95%]' : 'max-w-5xl w-[90%]'}`}>
+        <div className={`glass-morphism rounded-full flex items-center justify-between transition-all duration-500 ring-1 ring-white/10 ${scrolled ? 'px-6 py-3 bg-black/60 shadow-lg backdrop-blur-3xl' : 'px-8 py-4 bg-black/30'}`}>
           
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-10 h-10 rounded-full bg-accent text-black flex items-center justify-center font-bold font-arabic text-xl shadow-[0_0_20px_rgba(197,160,89,0.4)] group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-full bg-accent text-black flex items-center justify-center font-bold font-arabic text-xl shadow-glow group-hover:scale-110 transition-transform">
               S
             </div>
             <div className="flex flex-col">
@@ -53,18 +66,18 @@ const Navbar: React.FC = () => {
             
             <button 
               onClick={scrollToFooter}
-              className="hidden sm:block px-6 py-2.5 rounded-full hover:bg-white/10 text-[10px] font-bold uppercase tracking-[0.15em] transition-colors text-white/90 border border-transparent hover:border-white/10"
+              className="hidden sm:block px-6 py-2.5 rounded-full hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest transition-colors text-white/90 border border-transparent hover:border-white/10"
             >
               {t('contact')}
             </button>
 
-            <button className="px-6 py-2.5 rounded-full bg-white text-black hover:bg-gray-200 text-[10px] font-bold uppercase tracking-[0.15em] transition-all hover:scale-105 shadow-lg shadow-white/10">
+            <button className="px-6 py-2.5 rounded-full bg-white text-black hover:bg-gray-200 text-[10px] font-bold uppercase tracking-widest transition-all hover:scale-105 shadow-glow shadow-white/10">
               {t('menu')}
             </button>
           </div>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

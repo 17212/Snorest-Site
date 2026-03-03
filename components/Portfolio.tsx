@@ -1,4 +1,9 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Play, Pause, Volume2, ArrowLeft, ArrowRight, 
+  MapPin, X, Share, ChevronLeft, ChevronRight 
+} from 'lucide-react';
 import { PORTFOLIO_ITEMS } from '../constants';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Project } from '../types';
@@ -132,17 +137,15 @@ const CustomVideoPlayer: React.FC<{ src: string, poster: string, title: string }
               onClick={togglePlay}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-colors text-white"
             >
-              <span className="material-symbols-outlined text-2xl">
-                {isPlaying ? 'pause' : 'play_arrow'}
-              </span>
+              {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
             </button>
             <span className="text-white text-xs font-mono tracking-wider">
               {currentTime} / {duration}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-white text-lg">volume_up</span>
+          <div className="flex items-center gap-2 text-white">
+            <Volume2 size={18} />
             <input 
               type="range"
               min="0"
@@ -162,24 +165,25 @@ const CustomVideoPlayer: React.FC<{ src: string, poster: string, title: string }
           onClick={togglePlay}
           className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/10 transition-colors"
         >
-          <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-110 transition-transform duration-300">
-             <span className="material-symbols-outlined text-5xl text-white ml-1">play_arrow</span>
+          <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-glow hover:scale-110 transition-transform duration-300">
+             <Play size={32} className="text-white ml-2" />
           </div>
         </div>
       )}
     </div>
   );
 };
+
 // ------------------------------------
 
 const Portfolio: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
   
   const { t, language, dir } = useLanguage();
+  const isRtl = dir === 'rtl';
 
   // Combine Categories and Tags into one filter list
   const filters = useMemo(() => {
@@ -230,11 +234,7 @@ const Portfolio: React.FC = () => {
   };
 
   const handleCloseModal = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      setSelectedProject(null);
-      setIsClosing(false);
-    }, 400); // Match animation duration
+    setSelectedProject(null);
   };
 
   const handleProjectClick = (item: Project) => {
@@ -265,7 +265,12 @@ const Portfolio: React.FC = () => {
   return (
     <section className="py-24 bg-surface border-t border-white/5 overflow-hidden">
       <div className="px-6 mb-12 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12"
+        >
           <div>
             <span className="text-apple-gray text-xs font-bold tracking-[0.2em] uppercase block mb-3 pl-1">
               {t('selected_works')}
@@ -276,28 +281,33 @@ const Portfolio: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button 
-              onClick={() => scroll(dir === 'rtl' ? 'right' : 'left')}
-              className="w-12 h-12 rounded-full bg-surface-highlight border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 active:scale-95"
+              onClick={() => scroll(isRtl ? 'right' : 'left')}
+              className="w-12 h-12 rounded-full bg-surfaceHighlight border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 active:scale-95 text-white"
             >
-              <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>arrow_back</span>
+              {isRtl ? <ArrowRight size={20} /> : <ArrowLeft size={20} />}
             </button>
             <button 
-              onClick={() => scroll(dir === 'rtl' ? 'left' : 'right')}
-              className="w-12 h-12 rounded-full bg-surface-highlight border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 active:scale-95"
+              onClick={() => scroll(isRtl ? 'left' : 'right')}
+              className="w-12 h-12 rounded-full bg-surfaceHighlight border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 active:scale-95 text-white"
             >
-              <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>arrow_forward</span>
+              {isRtl ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Unified Apple-style Filter Bar */}
-        <div className="flex flex-wrap gap-3 mb-8">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap gap-3 mb-8"
+        >
           <button
               onClick={() => setActiveFilter('All')}
               className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 border border-transparent ${
                 activeFilter === 'All'
                   ? 'bg-white text-black shadow-lg scale-105'
-                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card hover:border-white/10'
+                  : 'bg-surfaceHighlight text-apple-gray hover:text-white hover:bg-surfaceCard hover:border-white/10'
               }`}
             >
               {t('all')} <span className="opacity-60 ml-1">({PORTFOLIO_ITEMS.length})</span>
@@ -309,95 +319,112 @@ const Portfolio: React.FC = () => {
               className={`px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 border border-transparent ${
                 activeFilter === filter
                   ? 'bg-white text-black shadow-lg scale-105'
-                  : 'bg-surface-highlight text-apple-gray hover:text-white hover:bg-surface-card hover:border-white/10'
+                  : 'bg-surfaceHighlight text-apple-gray hover:text-white hover:bg-surfaceCard hover:border-white/10'
               }`}
             >
               {filter} <span className="opacity-60 ml-1">({getCount(filter)})</span>
             </button>
           ))}
-        </div>
+        </motion.div>
       </div>
 
-      <div 
+      <motion.div 
+        layout
         ref={scrollContainerRef}
         className="flex overflow-x-auto gap-8 px-6 pb-20 no-scrollbar snap-x snap-mandatory max-w-[1800px] mx-auto perspective-container"
-        key={activeFilter} // Trigger animation on filter change
       >
-        {filteredItems.map((item, index) => {
-          const title = language === 'ar' ? item.title_ar : item.title;
-          const description = language === 'ar' ? item.description_ar : item.description;
-          const location = language === 'ar' ? item.location_ar : item.location;
-          const category = language === 'ar' ? item.category_ar : item.category;
-          const tags = language === 'ar' ? (item.tags_ar || []) : (item.tags || []);
+        <AnimatePresence mode="popLayout">
+          {filteredItems.map((item, index) => {
+            const title = language === 'ar' ? item.title_ar : item.title;
+            const description = language === 'ar' ? item.description_ar : item.description;
+            const location = language === 'ar' ? item.location_ar : item.location;
+            const category = language === 'ar' ? item.category_ar : item.category;
+            const tags = language === 'ar' ? (item.tags_ar || []) : (item.tags || []);
 
-          return (
-            <div
-              key={item.id}
-              className="min-w-[85vw] md:min-w-[500px] snap-center group preserve-3d animate-fade-in cursor-pointer"
-              style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => handleProjectClick(item)}
-            >
-              <div className="relative h-[650px] rounded-[2.5rem] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] transform group-hover:scale-[1.02] shadow-apple-card bg-surface-card border border-white/5">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-110"
-                  style={{ backgroundImage: `url('${item.imageUrl}')` }}
-                ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+            return (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.5 }}
+                layout
+                key={item.id}
+                className="min-w-[85vw] md:min-w-[500px] snap-center group preserve-3d cursor-pointer"
+                onClick={() => handleProjectClick(item)}
+              >
+                <div className="relative h-[650px] rounded-[2.5rem] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] transform group-hover:scale-[1.02] shadow-apple-card bg-surfaceCard border border-white/5">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-110"
+                    style={{ backgroundImage: `url('${item.imageUrl}')` }}
+                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
 
-                {/* Video Play Overlay */}
-                {item.videoUrl && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)]">
-                      <span className="material-symbols-outlined text-5xl text-white ml-2">play_arrow</span>
-                      <div className="absolute inset-0 rounded-full border border-white/30 animate-ping opacity-20"></div>
+                  {/* Video Play Overlay */}
+                  {item.videoUrl && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] text-white">
+                        <Play size={40} className="ml-2" />
+                        <div className="absolute inset-0 rounded-full border border-white/30 animate-ping opacity-20"></div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div className={`absolute top-8 ${dir === 'rtl' ? 'left-8' : 'right-8'} flex flex-col items-end gap-2`}>
-                   <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold tracking-widest px-4 py-1.5 rounded-full uppercase">
-                    {category}
-                  </span>
-                   <div className="flex gap-1">
-                      {tags.slice(0, 2).map(tag => (
-                        <span key={tag} className="bg-black/40 backdrop-blur-md text-white/70 text-[9px] px-3 py-1 rounded-full border border-white/5">
-                          {tag}
-                        </span>
-                      ))}
-                   </div>
-                </div>
-
-                <div className={`absolute bottom-0 w-full p-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${dir === 'rtl' ? 'right-0' : 'left-0'}`}>
-                  <h3 className="text-4xl md:text-5xl font-semibold text-white mb-3 tracking-tight">
-                    {title}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-4 text-apple-gray text-xs font-medium uppercase tracking-wide">
-                     <span className="material-symbols-outlined text-sm">location_on</span>
-                     {location}
+                  <div className={`absolute top-8 ${isRtl ? 'left-8' : 'right-8'} flex flex-col items-end gap-2`}>
+                     <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold tracking-widest px-4 py-1.5 rounded-full uppercase">
+                      {category}
+                    </span>
+                     <div className="flex gap-1">
+                        {tags.slice(0, 2).map(tag => (
+                          <span key={tag} className="bg-black/40 backdrop-blur-md text-white/70 text-[9px] px-3 py-1 rounded-full border border-white/5">
+                            {tag}
+                          </span>
+                        ))}
+                     </div>
                   </div>
-                  <p className={`text-gray-300 text-sm md:text-base leading-relaxed line-clamp-2 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100`}>
-                    {description}
-                  </p>
+
+                  <div className={`absolute bottom-0 w-full p-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isRtl ? 'right-0' : 'left-0'}`}>
+                    <h3 className="text-4xl md:text-5xl font-semibold text-white mb-3 tracking-tight">
+                      {title}
+                    </h3>
+                    <div className="flex items-center gap-2 mb-4 text-apple-gray text-xs font-medium uppercase tracking-wide">
+                       <MapPin size={14} />
+                       {location}
+                    </div>
+                    <p className={`text-gray-300 text-sm md:text-base leading-relaxed line-clamp-2 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100`}>
+                      {description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        
         {filteredItems.length === 0 && (
           <div className="w-full text-center py-20 text-gray-500">
             {t('no_projects')}
           </div>
         )}
-      </div>
+      </motion.div>
 
        {/* Enhanced Project Modal */}
-       {selectedProject && (
+      <AnimatePresence>
+        {selectedProject && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div 
-              className={`absolute inset-0 bg-black/60 backdrop-blur-3xl transition-opacity duration-400 ease-out ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-3xl"
               onClick={handleCloseModal}
-            ></div>
-            <div className={`relative w-full max-w-7xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[85vh] border border-white/10 ${isClosing ? 'animate-modal-exit' : 'animate-modal-enter'}`}>
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-7xl bg-[#1c1c1e] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row md:h-[85vh] border border-white/10"
+            >
               
               {/* Media Section (Video or Image) */}
               <div className="relative md:w-7/12 h-[40vh] md:h-full bg-black group">
@@ -423,39 +450,43 @@ const Portfolio: React.FC = () => {
               <div className="flex-1 flex flex-col relative bg-[#1c1c1e]">
                  <button 
                   onClick={handleCloseModal}
-                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${dir === 'rtl' ? 'left-8' : 'right-8'}`}
+                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${isRtl ? 'left-8' : 'right-8'}`}
                 >
-                  <span className="material-symbols-outlined text-white/80">close</span>
+                  <X size={20} className="text-white/80" />
                 </button>
 
                 {/* Share Button */}
                 <button 
                   onClick={handleShare}
-                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${dir === 'rtl' ? 'left-20' : 'right-20'}`}
+                  className={`absolute top-8 w-10 h-10 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] flex items-center justify-center transition-colors z-20 ${isRtl ? 'left-20' : 'right-20'}`}
                 >
-                  <span className="material-symbols-outlined text-white/80 text-sm">ios_share</span>
+                  <Share size={16} className="text-white/80" />
                   {showCopied && (
-                    <div className="absolute top-full mt-2 bg-white text-black text-[10px] font-bold py-1 px-2 rounded-md shadow-lg whitespace-nowrap">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute top-full mt-2 bg-white text-black text-[10px] font-bold py-1 px-2 rounded-md shadow-lg whitespace-nowrap"
+                    >
                       Copied!
-                    </div>
+                    </motion.div>
                   )}
                 </button>
 
                 {/* Navigation Buttons (Floating over Content) */}
-                <div className={`absolute top-1/2 -translate-y-1/2 z-30 w-full px-4 flex justify-between pointer-events-none ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                <div className={`absolute top-1/2 -translate-y-1/2 z-30 w-full px-4 flex justify-between pointer-events-none ${isRtl ? 'flex-row-reverse' : ''}`}>
                     {filteredItems.length > 1 && (
                       <>
                         <button 
                           onClick={handlePrev} 
                           className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-white hover:text-black transition-all flex items-center justify-center pointer-events-auto -ml-16 md:ml-0"
                         >
-                           <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>chevron_left</span>
+                           {isRtl ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                         </button>
                         <button 
                           onClick={handleNext} 
                           className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-white hover:text-black transition-all flex items-center justify-center pointer-events-auto -mr-16 md:mr-0"
                         >
-                           <span className={`material-symbols-outlined ${dir === 'rtl' ? 'rotate-180' : ''}`}>chevron_right</span>
+                           {isRtl ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                         </button>
                       </>
                     )}
@@ -472,13 +503,18 @@ const Portfolio: React.FC = () => {
                         {language === 'ar' ? selectedProject.location_ar : selectedProject.location}
                      </span>
                   </div>
-                  <h2 className="text-3xl md:text-5xl font-semibold text-white mb-0 leading-[1.1]">
+                  <motion.h2 
+                    key={selectedProject.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-3xl md:text-5xl font-semibold text-white mb-0 leading-[1.1]"
+                  >
                     {language === 'ar' ? selectedProject.title_ar : selectedProject.title}
-                  </h2>
+                  </motion.h2>
                 </div>
                 
                 {/* Scrollable Content */}
-                <div className={`overflow-y-auto no-scrollbar flex-grow p-10 md:p-14 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
+                <div className={`overflow-y-auto no-scrollbar flex-grow p-10 md:p-14 ${isRtl ? 'text-right' : 'text-left'}`}>
                   
                    {/* Specs Grid */}
                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
@@ -526,15 +562,20 @@ const Portfolio: React.FC = () => {
 
                 {/* Footer Action */}
                 <div className="p-8 md:p-14 pt-6 border-t border-white/5 bg-[#1c1c1e] z-10">
-                   <button className="bg-white text-black h-14 w-full rounded-full font-bold text-xs uppercase tracking-widest hover:scale-[1.01] transition-all shadow-lg flex items-center justify-center gap-2 group">
+                   <button className="bg-white text-black h-14 w-full rounded-full font-bold text-xs uppercase tracking-widest hover:scale-[1.01] transition-all shadow-glow flex items-center justify-center gap-2 group">
                       {t('start_project')}
-                      <span className={`material-symbols-outlined text-lg transition-transform ${dir === 'rtl' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>arrow_forward</span>
+                      {isRtl ? (
+                        <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                      ) : (
+                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                      )}
                    </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
+      </AnimatePresence>
 
     </section>
   );
